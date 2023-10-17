@@ -1,0 +1,41 @@
+name: Test assert_that
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  PYTEST_ADDOPTS: "--color=yes"
+
+jobs:
+  test:
+    name: Test (${{ matrix.python-version }})
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - name: 🛍️ Checkout
+        uses: actions/checkout@v4
+      - name: 🔁 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 🐝 Install beam from dask-runner-windowing branch
+        shell: bash -l {0}
+        run: |
+          git clone https://github.com/alxmrs/beam.git
+          cd ./beam/sdks/python
+          git checkout dask-runner-windowing
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dask,test]"
+      - name: 🐍 List env
+        shell: bash -l {0}
+        run: |
+          python -m pip list
+      - name: 🏃 Run tests
+        shell: bash -l {0}
+        run: pytest -vvv test_zero_equals_one.py
