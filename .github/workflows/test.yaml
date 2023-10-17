@@ -27,9 +27,8 @@ jobs:
       - name: 🐝 Install beam from dask-runner-windowing branch
         shell: bash -l {0}
         run: |
-          git clone https://github.com/alxmrs/beam.git
+          git clone --branch dask-runner-windowing https://github.com/alxmrs/beam.git
           cd ./beam/sdks/python
-          git checkout dask-runner-windowing
           python -m pip install --upgrade pip
           python -m pip install -e ".[dask,test]"
       - name: 🐍 List env
