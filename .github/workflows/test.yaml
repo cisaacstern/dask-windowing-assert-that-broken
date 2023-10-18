@@ -11,12 +11,13 @@ env:
 
 jobs:
   test:
-    name: Test (${{ matrix.python-version }})
+    name: py${{ matrix.python-version }}, beam@${{ matrix.beam-version }}
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
+        beam-version: ["2.51.0", "dask-runner-windowing"]
     steps:
       - name: 🛍️ Checkout
         uses: actions/checkout@v4
@@ -24,13 +25,19 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      - name: 🐝 Install beam from dask-runner-windowing branch
+      - name: 🐝 Install beam@${{ matrix.beam-version }}
         shell: bash -l {0}
         run: |
-          git clone --branch dask-runner-windowing https://github.com/alxmrs/beam.git
-          cd ./beam/sdks/python
           python -m pip install --upgrade pip
-          python -m pip install -e ".[dask,test]"
+          echo installing beam@${{ matrix.beam-version }}
+          if [ "${{ matrix.beam-version }}" = "2.51.0" ]; then
+            git clone --branch dask-runner-windowing https://github.com/alxmrs/beam.git
+            cd ./beam/sdks/python
+            python -m pip install -e ".[dask,test]"
+          else
+            python -m pip install "apache-beam==2.51.0"
+            python -m pip install -U "git+https://github.com/dask/distributed@2022.6.0"
+          fi
       - name: 🐍 List env
         shell: bash -l {0}
         run: |
