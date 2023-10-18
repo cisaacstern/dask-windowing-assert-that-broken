@@ -8,7 +8,7 @@ runners = ["DirectRunner", DaskRunner()]
 runner_ids = ["DirectRunner", "DaskRunner"]
 
 
-@pytest.mark.xfail  # These tests **SHOULD FAIL** because 0 != 1
+@pytest.mark.xfail(strict=True)  # These tests **SHOULD FAIL** because 0 != 1
 @pytest.mark.parametrize("runner", runners, ids=runner_ids)
 def test_zero_equals_one(runner):
     with test_pipeline.TestPipeline(runner=runner) as p:
